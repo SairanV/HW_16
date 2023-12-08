@@ -37,31 +37,92 @@ namespace HW_16
         /// <summary>
         /// Метод для отображения содержимого текущей директории
         /// </summary>
-
-        public void ShowCurrentDirectoryContents()
+        public void ShowCurrentDirectoryContents(bool recursive = false)
         {
             try
             {
-                string[] files = Directory.GetFiles(currentDirectory);
-                string[] directories = Directory.GetDirectories(currentDirectory);
+                DisplayDirectoryContents(currentDirectory, recursive);
 
-                Console.WriteLine("Файлы:");
-                foreach (string file in files)
-                {
-                    Console.WriteLine(Path.GetFileName(file));
-                }
-
-                Console.WriteLine("\nДиректории:");
-                foreach (string directory in directories)
-                {
-                    Console.WriteLine(Path.GetFileName(directory));
-                }
-
-                LogAction("Просмотр содержимого директории");
+                LogAction($"Просмотр {(recursive ? "рекурсивного " : "")}содержимого директории");
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Ошибка: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Рекурсивный метод для отображения содержимого директории
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="recursive"></param>
+        private void DisplayDirectoryContents(string path, bool recursive)
+        {
+            string[] files = Directory.GetFiles(path);
+            string[] directories = Directory.GetDirectories(path);
+
+            Console.WriteLine($"Содержимое директории {path}:");
+            Console.WriteLine("Файлы:");
+            foreach (string file in files)
+            {
+                Console.WriteLine(Path.GetFileName(file));
+            }
+
+            Console.WriteLine("\nДиректории:");
+            foreach (string directory in directories)
+            {
+                Console.WriteLine(Path.GetFileName(directory));
+                if (recursive)
+                {
+                    DisplayDirectoryContents(directory, true);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Метод для поиска файлов и директорий по имени
+        /// </summary>
+        /// <param name="name"></param>
+        public void Search(string name)
+        {
+            try
+            {
+                SearchInDirectory(currentDirectory, name);
+
+                LogAction($"Поиск файлов и директорий по имени: {name}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Рекурсивный метод для поиска файлов и директорий в директории
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="name"></param>
+        private void SearchInDirectory(string path, string name)
+        {
+            string[] files = Directory.GetFiles(path, name);
+            string[] directories = Directory.GetDirectories(path, name);
+
+            Console.WriteLine($"Результаты поиска в директории {path} для {name}:");
+            Console.WriteLine("Файлы:");
+            foreach (string file in files)
+            {
+                Console.WriteLine(Path.GetFileName(file));
+            }
+
+            Console.WriteLine("\nДиректории:");
+            foreach (string directory in directories)
+            {
+                Console.WriteLine(Path.GetFileName(directory));
+            }
+
+            foreach (string directory in directories)
+            {
+                SearchInDirectory(directory, name);
             }
         }
 
